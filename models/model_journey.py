@@ -9,11 +9,10 @@ from models.model_user import Users
 
 class Journey(SQLModel, table=True):
     """
-    Modèle de trajet enrichi avec cycle de vie complet.
+    Modèle de trajet simplifié (V1 POC).
 
-    Distinction entre données brutes (détectées) et données validées.
-    Le statut permet de suivre le parcours du trajet depuis la détection
-    jusqu'à la validation finale qui déclenche l'attribution des récompenses.
+    Les trajets sont créés directement validés ou peuvent être rejetés.
+    Pas d'historique de modification pour simplifier la V1.
     """
     __tablename__ = "Journey"
 
@@ -34,7 +33,7 @@ class Journey(SQLModel, table=True):
         description="Source de détection du trajet"
     )
 
-    # Données spatiales et temporelles (données brutes ou validées)
+    # Données spatiales et temporelles
     place_departure: str = Field(max_length=200, nullable=False)
     place_arrival: str = Field(max_length=200, nullable=False)
     time_departure: datetime = Field(nullable=False)
@@ -55,26 +54,10 @@ class Journey(SQLModel, table=True):
     # Mode de transport
     transport_type: TransportType = Field(nullable=False)
 
-    # Score (calculé après validation)
+    # Score (calculé à la création du trajet validé)
     score_journey: Optional[int] = Field(
         default=None,
-        description="Score total attribué (calculé après validation)"
-    )
-
-    # Métadonnées de modification
-    original_place_departure: Optional[str] = Field(
-        default=None,
-        max_length=200,
-        description="Lieu de départ original (avant modification utilisateur)"
-    )
-    original_place_arrival: Optional[str] = Field(
-        default=None,
-        max_length=200,
-        description="Lieu d'arrivée original (avant modification utilisateur)"
-    )
-    original_transport_type: Optional[TransportType] = Field(
-        default=None,
-        description="Mode de transport original (avant modification utilisateur)"
+        description="Score total attribué"
     )
 
     # Dates de gestion
@@ -98,7 +81,6 @@ class JourneyCreate(SQLModel):
     Schéma de création d'un trajet VALIDÉ.
 
     L'utilisateur envoie uniquement des trajets qu'il a validés depuis l'app mobile.
-    Le backend n'a pas besoin de recevoir les trajets en attente de validation.
     """
     place_departure: str
     place_arrival: str
@@ -107,20 +89,6 @@ class JourneyCreate(SQLModel):
     distance_km: float
     transport_type: TransportType
     detection_source: DetectionSource = DetectionSource.MANUAL
-
-
-class JourneyUpdate(SQLModel):
-    """
-    Schéma de modification d'un trajet avant validation.
-
-    Permet à l'utilisateur de corriger les données détectées automatiquement.
-    """
-    place_departure: Optional[str] = None
-    place_arrival: Optional[str] = None
-    time_departure: Optional[datetime] = None
-    time_arrival: Optional[datetime] = None
-    distance_km: Optional[float] = None
-    transport_type: Optional[TransportType] = None
 
 
 class JourneyRead(SQLModel):
@@ -140,10 +108,3 @@ class JourneyRead(SQLModel):
     created_at: datetime
     validated_at: Optional[datetime]
     rejected_at: Optional[datetime]
-
-
-class JourneyReadWithModifications(JourneyRead):
-    """Schéma de lecture d'un trajet avec historique des modifications."""
-    original_place_departure: Optional[str]
-    original_place_arrival: Optional[str]
-    original_transport_type: Optional[TransportType]
