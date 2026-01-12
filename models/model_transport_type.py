@@ -3,25 +3,11 @@ from enum import Enum
 
 class TransportType(str, Enum):
     """
-    Types de transport disponibles.
+    Types de transport disponibles (V1 simplifiée POC).
 
-    Classés par ordre d'impact écologique (du plus au moins écologique).
+    Limité aux 4 catégories principales pour éviter toute ambiguïté.
     """
-    # Modes actifs (zéro émission)
     marcheapied = "apied"
     velo = "velo"
-    trottinette = "trottinette"
-
-    # Transports en commun (émission partagée)
-    metro = "metro"
-    bus = "bus"
-    tramway = "tramway"
-    train = "train"
-
-    # Covoiturage
-    covoiturage = "covoiturage"
-
-    # Véhicules individuels
-    voiture_electrique = "voiture_electrique"
-    voiture_thermique = "voiture_thermique"
-    moto = "moto"
+    transport_commun = "transport_commun"
+    voiture = "voiture"

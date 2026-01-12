@@ -1,5 +1,5 @@
 """
-Endpoints API pour la gestion des trajets.
+Endpoints API pour la gestion des trajets (V1 simplifiée POC).
 
 Tous les endpoints sont protégés par authentification JWT.
 L'utilisateur ne peut accéder qu'à ses propres trajets.
@@ -12,14 +12,11 @@ from sqlmodel import Session
 from core.database import get_session
 from core.core_auth import get_current_user
 from models.model_user import Users
-from models.model_journey import Journey, JourneyCreate, JourneyUpdate, JourneyRead
+from models.model_journey import JourneyCreate, JourneyRead
 from core.core_journey import (
     create_validated_journey_core,
     list_validated_journeys_core,
-    list_pending_journeys_core,
     get_journey_core,
-    update_journey_core,
-    validate_journey_core,
     reject_journey_core,
     delete_journey_core,
     get_user_statistics_core,
@@ -41,7 +38,6 @@ router = APIRouter(prefix="/journey", tags=["Journey"])
     - Calcule automatiquement la durée à partir des horaires
     - Calcule automatiquement le score selon les règles métier
     - Enregistre le trajet avec statut VALIDATED
-    - Enregistre l'historique du calcul de score
 
     Le score est attribué immédiatement.
     """
@@ -78,26 +74,6 @@ def list_validated_journeys(
 
 
 @router.get(
-    "/pending",
-    response_model=List[JourneyRead],
-    summary="Lister les trajets en attente",
-    description="""
-    Récupère tous les trajets en attente de validation.
-
-    Note : Dans le POC actuel, cette route ne sera pas utilisée car
-    les trajets en attente restent locaux sur le mobile. Elle est
-    prête pour une évolution future.
-    """
-)
-def list_pending_journeys(
-    current_user: Users = Depends(get_current_user),
-    session: Session = Depends(get_session),
-):
-    """Liste tous les trajets en attente de l'utilisateur."""
-    return list_pending_journeys_core(session, current_user.id)
-
-
-@router.get(
     "/{journey_id}",
     response_model=JourneyRead,
     summary="Récupérer un trajet",
@@ -110,56 +86,6 @@ def get_journey(
 ):
     """Récupère un trajet par son ID."""
     return get_journey_core(session, journey_id, current_user.id)
-
-
-@router.patch(
-    "/{journey_id}",
-    response_model=JourneyRead,
-    summary="Modifier un trajet",
-    description="""
-    Modifie un trajet avant validation.
-
-    Permet de corriger les données détectées automatiquement.
-    Les valeurs originales sont conservées dans les champs original_*.
-
-    Le statut passe à MODIFIED.
-    Ne peut pas modifier un trajet déjà validé ou rejeté.
-    """
-)
-def update_journey(
-    journey_id: int,
-    data: JourneyUpdate,
-    current_user: Users = Depends(get_current_user),
-    session: Session = Depends(get_session),
-):
-    """Modifie un trajet avant validation."""
-    return update_journey_core(session, journey_id, current_user.id, data)
-
-
-@router.post(
-    "/{journey_id}/validate",
-    response_model=JourneyRead,
-    summary="Valider un trajet",
-    description="""
-    Valide un trajet en attente ou modifié.
-
-    Cette action :
-    - Change le statut à VALIDATED
-    - Enregistre la date de validation
-    - Calcule le score automatiquement
-    - Rend le trajet éligible aux récompenses
-
-    Note : Dans le POC actuel, les trajets sont créés directement validés.
-    Cette route est prête pour une évolution future.
-    """
-)
-def validate_journey(
-    journey_id: int,
-    current_user: Users = Depends(get_current_user),
-    session: Session = Depends(get_session),
-):
-    """Valide un trajet en attente."""
-    return validate_journey_core(session, journey_id, current_user.id)
 
 
 @router.post(
@@ -208,13 +134,12 @@ def delete_journey(
     "/statistics/me",
     summary="Récupérer mes statistiques",
     description="""
-    Récupère les statistiques de l'utilisateur connecté.
+    Récupère les statistiques simplifiées de l'utilisateur connecté.
 
     Calcule :
     - Nombre total de trajets validés
     - Distance totale parcourue
     - Score total
-    - Répartition par mode de transport
     """
 )
 def get_my_statistics(
