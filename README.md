@@ -97,6 +97,7 @@ Aucune commande SQL manuelle n'est necessaire.
 ## Lancer l'API
 
 ```bash
+chmod 744 run.sh
 ./run.sh
 # ou: uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
