@@ -7,7 +7,7 @@ class TransportType(str, Enum):
 
     Limité aux 4 catégories principales pour éviter toute ambiguïté.
     """
-    marcheapied = "apied"
+    marche = "marche"
     velo = "velo"
     transport_commun = "transport_commun"
     voiture = "voiture"

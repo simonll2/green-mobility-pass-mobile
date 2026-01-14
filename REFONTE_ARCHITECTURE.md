@@ -115,7 +115,7 @@ class TransportType(str, Enum):
     """
     Types de transport disponibles.
     """
-    marcheapied = "apied"
+    marche = "marche"
     velo = "velo"
     transport_commun = "transport_commun"  # Regroupe bus/métro/tram/train
     voiture = "voiture"  # Regroupe électrique/thermique

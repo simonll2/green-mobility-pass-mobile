@@ -12,7 +12,7 @@ from models.model_journey import Journey
 
 # Configuration des scores de base par mode de transport
 TRANSPORT_BASE_SCORES = {
-    TransportType.marcheapied: 100,
+    TransportType.marche: 100,
     TransportType.velo: 90,
     TransportType.transport_commun: 70,
     TransportType.voiture: 20,
@@ -20,7 +20,7 @@ TRANSPORT_BASE_SCORES = {
 
 # Modes actifs éligibles au bonus écologique
 ECO_BONUS_MODES = {
-    TransportType.marcheapied,
+    TransportType.marche,
     TransportType.velo,
 }
 
