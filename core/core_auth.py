@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -7,11 +8,16 @@ from passlib.context import CryptContext
 
 from core.database import get_session
 from models.model_user import Users
+from models.model_role import UserRole
 
-SECRET_KEY = "SECRET"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+# Configuration depuis variables d'environnement
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable is not set. Please configure it in .env file.")
+
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -102,3 +108,20 @@ async def get_current_user(
         )
 
     return user
+
+
+def require_admin(user: Users) -> None:
+    """
+    Verifie que l'utilisateur a le role admin.
+
+    Args:
+        user: L'utilisateur a verifier
+
+    Raises:
+        HTTPException: 403 si l'utilisateur n'est pas admin
+    """
+    if user.role != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required"
+        )

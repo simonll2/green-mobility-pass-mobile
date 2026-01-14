@@ -14,7 +14,7 @@ class Journey(SQLModel, table=True):
     Les trajets sont créés directement validés ou peuvent être rejetés.
     Pas d'historique de modification pour simplifier la V1.
     """
-    __tablename__ = "Journey"
+    __tablename__ = "journey"
 
     # Identifiants
     id: Optional[int] = Field(default=None, primary_key=True)

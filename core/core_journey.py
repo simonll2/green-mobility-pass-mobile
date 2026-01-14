@@ -170,10 +170,13 @@ def reject_journey_core(
     """
     Rejette un trajet.
 
-    Un trajet rejeté :
-    - N'est pas comptabilisé dans les statistiques
+    Un trajet valide peut etre rejete a posteriori par l'utilisateur
+    (erreur de detection, correction manuelle).
+
+    Un trajet rejete :
+    - N'est pas comptabilise dans les statistiques
     - N'attribue aucun point
-    - Est conservé en base pour audit
+    - Est conserve en base pour audit
 
     Args:
         session: Session SQLModel
@@ -181,17 +184,14 @@ def reject_journey_core(
         user_id: ID de l'utilisateur
 
     Returns:
-        Journey: Le trajet rejeté
+        Journey: Le trajet rejete
 
     Raises:
-        HTTPException: Si trajet non trouvé ou déjà validé
+        HTTPException: Si trajet non trouve ou deja rejete
     """
     journey = _verify_journey_ownership(session, journey_id, user_id)
 
-    # Vérifier que le trajet peut être rejeté
-    if journey.status == JourneyStatus.VALIDATED:
-        raise HTTPException(400, "Cannot reject a validated journey")
-
+    # Verifier que le trajet n'est pas deja rejete
     if journey.status == JourneyStatus.REJECTED:
         raise HTTPException(400, "Journey is already rejected")
 

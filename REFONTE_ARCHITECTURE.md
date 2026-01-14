@@ -12,14 +12,16 @@ Ce document décrit l'architecture **simplifiée V1** du backend du projet Green
 
 ## 🎯 Vision Métier Implémentée
 
-### Workflow V1 Simplifié
+### Workflow V1 Simplifie
 
 1. **Validation locale** : L'utilisateur valide ou rejette des trajets sur son smartphone
-2. **Synchronisation** : Seuls les trajets validés sont envoyés au backend
-3. **Score automatique** : Le backend calcule le score instantanément
+2. **Synchronisation** : Seuls les trajets valides sont envoyes au backend
+3. **Score automatique** : Le backend calcule le score instantanement
 4. **Consultation** : L'utilisateur peut consulter ses trajets et statistiques
 
-### Principes Respectés
+> **Note importante** : Un trajet valide peut etre rejete a posteriori par l'utilisateur (erreur de detection, correction manuelle). Cette transition `VALIDATED -> REJECTED` est autorisee pour permettre les corrections.
+
+### Principes Respectes
 
 ✅ **RGPD** : Seules les données validées sont centralisées
 ✅ **Simplicité** : Pas de statuts intermédiaires, pas d'historique complexe
