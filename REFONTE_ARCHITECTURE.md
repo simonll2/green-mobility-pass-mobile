@@ -1,18 +1,16 @@
-# Backend Simplifié - Green Mobility Pass (V1 POC)
+# Backend - Green Mobility Pass (V1 POC)
 
 ## 📋 Résumé Exécutif
 
-Ce document décrit l'architecture **simplifiée V1** du backend du projet Green Mobility Pass (PFE Michelin & SNCF - Movin'On).
+Ce document décrit l'architecture **pour la V1** du backend du projet Green Mobility Pass (PFE Michelin & SNCF - Movin'On).
 
-**Objectif** : Fournir un backend **réaliste pour un POC d'1 mois**, en se concentrant sur les fonctionnalités essentielles et en éliminant tout ce qui est over-engineered pour une V1.
-
-**Philosophie** : *"Ce que livrerait une équipe d'ingénieurs en 1 mois pour une V1 de POC, en faisant des choix réalistes, assumés et justifiables."*
+**Objectif** : Fournir un backend **réaliste pour un POC**, en se concentrant sur les fonctionnalités essentielles et en éliminant tout ce qui est over-engineered pour une V1.
 
 ---
 
 ## 🎯 Vision Métier Implémentée
 
-### Workflow V1 Simplifie
+### Workflow V1
 
 1. **Validation locale** : L'utilisateur valide ou rejette des trajets sur son smartphone
 2. **Synchronisation** : Seuls les trajets valides sont envoyes au backend
@@ -30,9 +28,9 @@ Ce document décrit l'architecture **simplifiée V1** du backend du projet Green
 
 ---
 
-## 🏗️ Architecture V1 Simplifiée
+## 🏗️ Architecture V1
 
-### Schéma de l'Architecture
+### Schéma de l'Architecture pour la logique des trajets
 
 ```
 ┌─────────────────┐
@@ -90,23 +88,23 @@ Ce document décrit l'architecture **simplifiée V1** du backend du projet Green
 
 ---
 
-## 📁 Modèles de Données Simplifiés
+## 📁 Modèles de Données
 
-### 1. **JourneyStatus** (Simplifié)
+### 1. **JourneyStatus**
 
 ```python
 class JourneyStatus(str, Enum):
     """
-    Statut du cycle de vie d'un trajet (V1 simplifiée POC).
+    Statut du cycle de vie d'un trajet (simplifié pour un POC)
     """
     VALIDATED = "validated"  # Trajet validé, éligible aux récompenses
     REJECTED = "rejected"    # Trajet rejeté
 ```
 
 **Simplifications** :
-- ❌ Supprimé `DETECTED` (pas de détection automatique en V1)
+- ❌ Supprimé `DETECTED` (Les trajets sont uniquement envoyé depuis l'app mobile avec soit validé ou rejeté)
 - ❌ Supprimé `PENDING_VALIDATION` (validation côté mobile uniquement)
-- ❌ Supprimé `MODIFIED` (pas de modification après création)
+- ❌ Supprimé `MODIFIED` (pas de modification après création, modification locale uniquement depuis l'app mobile avant l'envoie du trajet au backend)
 
 ---
 
@@ -115,7 +113,7 @@ class JourneyStatus(str, Enum):
 ```python
 class TransportType(str, Enum):
     """
-    Types de transport disponibles (V1 simplifiée POC).
+    Types de transport disponibles.
     """
     marcheapied = "apied"
     velo = "velo"
@@ -136,7 +134,7 @@ class TransportType(str, Enum):
 
 ```python
 class Journey(SQLModel, table=True):
-    """Modèle de trajet simplifié (V1 POC)."""
+    """Modèle de trajet."""
 
     # Identifiants
     id: int
@@ -177,7 +175,7 @@ class Journey(SQLModel, table=True):
 
 ### 4. **ScoreHistory** ❌ SUPPRIMÉ
 
-**Justification** : Dans une V1 de POC, le score est calculé une seule fois et ne change pas. Pas besoin de traçabilité complexe ni de recalcul.
+**Justification** : Dans la V1 du POC, le score est calculé une seule fois et ne change pas. Pas besoin de traçabilité complexe ni de recalcul.
 
 ---
 
@@ -202,7 +200,7 @@ class Journey(SQLModel, table=True):
 
 ### Core Score (core_score.py)
 
-**Algorithme simplifié** :
+**Algorithme** :
 
 ```
 SCORE_TOTAL = BASE_SCORE + DISTANCE_BONUS + ECO_BONUS
@@ -229,7 +227,7 @@ ECO_BONUS : 50 points si mode actif (marche, vélo)
 
 ---
 
-## 🌐 Endpoints API Simplifiés
+## 🌐 Endpoints API
 
 ### Endpoints disponibles
 
@@ -250,7 +248,7 @@ ECO_BONUS : 50 points si mode actif (marche, vélo)
 
 ---
 
-## 📊 Statistiques Simplifiées
+## 📊 Statistiques
 
 **Données retournées** :
 ```json
